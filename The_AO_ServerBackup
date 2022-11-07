@@ -41,15 +41,15 @@ WRLD_BACKUP=/your/backup/server/Worlds                                        #S
 LOG_BACKUP=/your/backup/server/Logs                                           #Source for GO_CLEAN_LOGS
 
 #//Notification paths
-NOTI_SOUND='/mnt/Servers/Terraria/Backup_Resources/mirror.mp3'                  #Source for notification sound *Terraria Magic Mirror*
-NOTI_ICON=/mnt/Servers/Terraria/Backup_Resources/icon.png                       #Source for notification icon *Terraria Logo*
+NOTI_SOUND='/mnt/Servers/Terraria/Backup_Resources/mirror.mp3'                #Source for notification sound *Terraria Magic Mirror*
+NOTI_ICON=/mnt/Servers/Terraria/Backup_Resources/icon.png                     #Source for notification icon *Terraria Logo*
 
 #//Backup directories
-BACKUP_PLR_DIR=/mnt/Servers/Terraria/Toons                                      #Local Player Character data location    
-BACKUP_WRLD_DIR=/mnt/Servers/Terraria/Worlds                                    #Server World Location
+BACKUP_PLR_DIR=/mnt/Servers/Terraria/Toons                                    #Local Player Character data location    
+BACKUP_WRLD_DIR=/mnt/Servers/Terraria/Worlds                                  #Server World Location
 
 #//Misc.
-DATE=$(date +"%d-%m")_$(date +"%T")                                             #Sets date for archive naming
+DATE=$(date +"%d-%m")_$(date +"%T")                                           #Sets date for archive naming
 
 
 #########################################################################################################################################################################################################################################################################
