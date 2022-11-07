@@ -4,7 +4,7 @@
 #Author: AlphaObeisance 2022
 #Written for Linux users.
 #Objective: Archives Terraria Server World and .local character data to backup drive and provides automated archive cleanup to ensure saved storage space by keeping only the predetermined amount of backups on hand. (See ARCHIVE CLEANUP)
-#NOTICE:"vlc" must be installed to utilze desktop notification functions. Else, comment out the NOTIFY DESKTOP section.
+#NOTICE:"vlc" must be installed to utilze desktop notification functions.Disabled by default.
 #########################################################################################################################################################################################################################################################################
 #//Text options set
 #########################################################################################################################################################################################################################################################################
@@ -214,12 +214,12 @@ function CLEANUP_LOGS
 #########################################################################################################################################################################################################################################################################
 
 #Notify Desktop
-function NOTIFY_EXIT 
-{
- DISPLAY=:0 notify-send -i $NOTI_ICON -a "AO's Terraria Backup" -t 35000 "Backup Complete!" "Your Terraria backup cronjob has successfully completed it's backup tasks. See backup directory logs for more info." | LOGIT ;
-  cvlc $NOTI_SOUND vlc://quit
- exit;
-}
+#function NOTIFY_EXIT 
+#{
+# DISPLAY=:0 notify-send -i $NOTI_ICON -a "AO's Terraria Backup" -t 35000 "Backup Complete!" "Your Terraria backup cronjob has successfully completed it's backup tasks. See backup directory logs for more info." | LOGIT ;
+#  cvlc $NOTI_SOUND vlc://quit
+# exit;
+#}
 
 
 #########################################################################################################################################################################################################################################################################
