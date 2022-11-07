@@ -1,0 +1,237 @@
+#########################################################################################################################################################################################################################################################################
+#//DESCRIPTION
+#########################################################################################################################################################################################################################################################################
+#Author: AlphaObeisance 2022
+#Objective: Archives Terraria Server World and .local character data to backup drive and provides automated archive cleanup to ensure saved storage space by keeping only the predetermined amount of backups on hand. (See ARCHIVE CLEANUP)
+#NOTICE: "xdotool" and "vlc" must be installed to utilze desktop notification functions. Else, comment out the NOTIFY DESKTOP section.
+#########################################################################################################################################################################################################################################################################
+#//Text options set
+#########################################################################################################################################################################################################################################################################
+
+set +x
+function BOLD(){ echo -e "\e[1m$1 \e[0m"            #Sets BOLD
+  if [ ! -z "${2}" ]; then
+  echo -e "\e[1m $($2) \e[0m"
+  fi }
+
+function RED(){ echo -e "\x1B[31m $1 \x1B[0m"       #Sets RED
+  if [ ! -z "${2}" ]; then
+  echo -e "\x1B[31m $($2) \x1B[0m"
+  fi }
+
+function GREEN(){ echo -e "\x1B[32m $1 \x1B[0m"     #Sets GREEN
+  if [ ! -z "${2}" ]; then
+  echo -e "\x1B[32m $($2) \x1B[0m"
+  fi }
+
+
+#########################################################################################################################################################################################################################################################################
+#//DEFINE VARIABLES
+#########################################################################################################################################################################################################################################################################
+#//Log Info
+LOG_DIR=/mnt/Servers/Terraria/Logs                                            #Log location
+LOG=/mnt/Servers/Terraria/Logs/LOG-$(date +"%d-%m")_$(date +"%T").txt         #Creates log file
+
+#//Local Directories
+LOCAL=/home/$USER/.local/share/Terraria                                       #Source for GO_LOCAL
+TSERVER=/your/server/directory/                                               #Source for GO_TSERVER
+TOON_BACKUP=/your/backup/server/Toons                                         #Source for GO_CLEAN_PLR
+WRLD_BACKUP=/your/backup/server/Worlds                                        #Source for GO_CLEAN_WLDS
+LOG_BACKUP=/your/backup/server/Logs                                           #Source for GO_CLEAN_LOGS
+
+#//Notification paths
+NOTI_SOUND='/mnt/Servers/Terraria/Backup_Resources/mirror.mp3'                  #Source for notification sound *Terraria Magic Mirror*
+NOTI_ICON=/mnt/Servers/Terraria/Backup_Resources/icon.png                       #Source for notification icon *Terraria Logo*
+
+#//Backup directories
+BACKUP_PLR_DIR=/mnt/Servers/Terraria/Toons                                      #Local Player Character data location    
+BACKUP_WRLD_DIR=/mnt/Servers/Terraria/Worlds                                    #Server World Location
+
+#//Misc.
+DATE=$(date +"%d-%m")_$(date +"%T")                                             #Sets date for archive naming
+
+
+#########################################################################################################################################################################################################################################################################
+#//DEFINED INIT - LOGIT - CHECK FUNCTIONS
+#########################################################################################################################################################################################################################################################################
+
+#//Announce Init. 
+function INIT 
+{
+ BOLD "Initiating Terraria Servers Backup..." | LOGIT & sleep 1;
+}
+
+#//Log Creation
+function LOGIT 
+{
+ tee -a $LOG ;
+}
+
+#//Directory check and report
+function CHECK_LOG_DIR 
+{
+ RED "NOTE: Backup logs will be stored at $LOG_DIR" | LOGIT & sleep 1;
+  if [ ! -d $LOG_DIR ]; 
+   then
+    RED "ERROR: Log directory missing; creating it at $LOG_DIR" | LOGIT & mkdir $LOG_DIR | sleep 1;
+   else 
+  sleep 1;
+ fi
+} 
+
+#########################################################################################################################################################################################################################################################################
+#//SOURCE DIRECTORY VERIFICATION
+#########################################################################################################################################################################################################################################################################
+
+#Checks for local player character directory
+function CHECK_PLAYER 
+{
+ echo "Seeking out LOCAL PLAYER CHARACTERS..." | LOGIT & sleep 2;
+  if [ ! -d $PLAYERS ]; 
+   then 
+    RED "ERROR:LOCAL PLAYER CHARACTERS not found! Exiting backup utility" | LOGIT & exit; 
+   else 
+  GREEN "LOCAL PLAYER CHARACTER data has been located!" | LOGIT & sleep 1.5; 
+ fi 
+}
+
+#Checks for server worlds directory
+function CHECK_WORLDS 
+{
+ echo "Searching for SERVER WORLDS..." | LOGIT & sleep 2;
+  if [ ! -d $WORLDS ]; 
+   then
+    RED "ERROR: SERVER WORLDS not found! Exiting backup utility" | LOGIT & exit; 
+   else 
+  GREEN "SERVER WORLDS have all been discovered!" | LOGIT & sleep 1.5; 
+ fi 
+}
+
+#########################################################################################################################################################################################################################################################################
+#//NAVIGATION FUNCTIONS
+#########################################################################################################################################################################################################################################################################
+
+#Go to local Terraria directory
+function GO_LOCAL 
+{
+  cd $LOCAL ;
+}
+
+#Go to server directory
+function GO_TSERVER
+{
+ cd $TSERVER ;
+}
+
+#Navigate to backup player archives for cleaning
+function GO2_CLEAN_PLR
+{
+ cd $TOON_BACKUP ;
+}
+
+#Navigate to worlds backup archive for cleaning
+function GO2_CLEAN_WLDS
+{
+ cd $WRLD_BACKUP ;
+}
+
+#Navigate to backup logs archive for cleaning
+function GO2_CLEAN_LOGS
+{
+ cd $LOG_BACKUP ;
+}
+
+
+#########################################################################################################################################################################################################################################################################
+#//DIRECTORY COMPRESSION AND RELOCATION
+#########################################################################################################################################################################################################################################################################
+
+#Arvhive local player characters
+function ARK_PLAYERS 
+{ 
+ GO_LOCAL ; 
+  echo "Compressing LOCAL PLAYER CHARACTERS..." | LOGIT & sleep 2;
+   echo "Moving compressed LOCAL PLAYER CHARACTERS to archives..." | LOGIT ;
+    tar -czf TOONS.tar.gz Players | wait ;
+   mv TOONS.tar.gz $BACKUP_PLR_DIR/TOONS-$(date +"%d-%m")_$(date +"%T").tar.gz & wait ; 
+  BOLD "LOCAL PLAYER CHARACTERS successfully backed up!" | LOGIT ;
+ sleep 2;
+}
+
+#Archive worlds
+function ARK_WORLDS 
+{
+ GO_TSERVER ; 
+  echo "Compressing SERVER WORLDS..." | LOGIT & sleep 2;
+   echo "Moving compressed SERVER WORLDS to the archives, please be patient... " | LOGIT ;
+    tar -czf WORLDS.tar.gz Worlds | wait ;
+   mv WORLDS.tar.gz $BACKUP_WRLD_DIR/WORLDS-$(date +"%d-%m")_$(date +"%T").tar.gz & wait ; 
+  BOLD "All SERVER WORLDS successfully backed up!" | LOGIT ;
+ sleep 2;
+}
+
+#########################################################################################################################################################################################################################################################################
+#//ARCHIVE CLEANUP
+#########################################################################################################################################################################################################################################################################
+
+#Cleanup dated player archives
+function CLEANUP_PLAYERS 
+         { 
+          echo "Inspecting PLAYER CHARACTER archives for cleanup... " | LOGIT & sleep 2;
+           GREEN "Pruning PLAYER CHARACTER backup database of dated archives..." | LOGIT & sleep 1.75;
+            GO2_CLEAN_PLR ;
+            ls -tp | grep -v '/$' | tail -n +25| xargs -d '\n' -r rm --
+           GREEN "Player archives spruced up!" | LOGIT & sleep 1.5 ;
+          sleep 2; 
+         }
+
+        #Cleanup dated world archives
+function CLEANUP_WORLDS
+             { 
+              echo "Inspecting SERVER WORLD archives for cleanup..." | LOGIT & sleep 2;
+               echo "Weeding out the aged SERVER WORLD archives" | LOGIT & sleep 1.75;
+                GO2_CLEAN_WLDS ;
+                ls -tp | grep -v '/$' | tail -n +25 | xargs -d '\n' -r rm -- ;
+               GREEN "World archives are now squeaky clean!" | LOGIT & sleep 1;
+              sleep 2; 
+             }
+
+#Cleanup dated world archives
+function CLEANUP_LOGS
+         { 
+          echo "Initiating Cleanup Inspection of LOG archives... " | LOGIT & sleep 2;
+           echo "Cleaning up dated Logs..." | LOGIT & sleep 1.75;
+            GO2_CLEAN_LOGS ;
+             ls -tp | grep -v '/$' | tail -n +25 | xargs -d '\n' -r rm -- | LOGIT ;
+            GREEN "Logs have been organized!" | LOGIT sleep 1;
+           sleep 2; 
+          BOLD "Backup COMPLETE!" | LOGIT ;
+         }
+
+#########################################################################################################################################################################################################################################################################
+#//DESKTOP NOTIFICATION OF COMPLETION
+#########################################################################################################################################################################################################################################################################
+
+#Notify Desktop
+function NOTIFY_EXIT 
+{
+ DISPLAY=:0 notify-send -i $NOTI_ICON -a "AO's Terraria Backup" -t 35000 "Backup Complete!" "Your Terraria backup cronjob has successfully completed it's backup tasks. See backup directory logs for more info." | LOGIT ;
+  cvlc $NOTI_SOUND vlc://quit
+ exit;
+}
+
+
+#########################################################################################################################################################################################################################################################################
+#//EXECUTION
+#########################################################################################################################################################################################################################################################################
+
+INIT
+ CHECK_LOG_DIR
+  CHECK_PLAYER 
+   ARK_PLAYERS
+    CHECK_WORLDS
+    ARK_WORLDS
+   CLEANUP_PLAYERS
+  CLEANUP_WORLDS
+ CLEANUP_LOGS
+NOTIFY_EXIT 
