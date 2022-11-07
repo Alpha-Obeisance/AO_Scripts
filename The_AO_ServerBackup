@@ -2,8 +2,9 @@
 #//DESCRIPTION
 #########################################################################################################################################################################################################################################################################
 #Author: AlphaObeisance 2022
+#Written for Linux users.
 #Objective: Archives Terraria Server World and .local character data to backup drive and provides automated archive cleanup to ensure saved storage space by keeping only the predetermined amount of backups on hand. (See ARCHIVE CLEANUP)
-#NOTICE: "xdotool" and "vlc" must be installed to utilze desktop notification functions. Else, comment out the NOTIFY DESKTOP section.
+#NOTICE:"vlc" must be installed to utilze desktop notification functions. Else, comment out the NOTIFY DESKTOP section.
 #########################################################################################################################################################################################################################################################################
 #//Text options set
 #########################################################################################################################################################################################################################################################################
